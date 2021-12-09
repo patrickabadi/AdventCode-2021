@@ -49,6 +49,8 @@
     <Compile Include="adv004.cs" />
     <Compile Include="adv005.cs" />
     <Compile Include="adv006.cs" />
+    <Compile Include="adv007.cs" />
+    <Compile Include="adv008.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
