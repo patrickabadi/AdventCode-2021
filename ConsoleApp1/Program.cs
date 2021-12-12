@@ -12,7 +12,8 @@ namespace ConsoleApp1
         {
 
 
-            var r = new adv008();
+            //var r = new adv012();
+            var r = new TestBinaryTree();
             r.Run();
         }
 
