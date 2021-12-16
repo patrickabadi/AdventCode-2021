@@ -6,17 +6,11 @@ using System.Threading.Tasks;
 
 namespace ConsoleApp1
 {
-    class Program
+    public class adv016
     {
-        static void Main(string[] args)
+        public void Run()
         {
 
-
-            var r = new adv016();
-            r.Run();
         }
-
-        
-
     }
 }

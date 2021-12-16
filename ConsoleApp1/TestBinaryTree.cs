@@ -10,82 +10,48 @@ namespace ConsoleApp1
     {
         public void Run()
         {
-            string input = "5*4+16*8";
-
-            /*
-             *               +
-             *             *    *
-             *            5 4  16 8
-             *            
-             *            5
-             *            
-             *            
-             */
-
-            Node tree = BuildTree(input);
+            var tree = new Node(3, new Node(9), new Node(20, new Node(15), new Node(7)));
         }
 
-        private Node BuildTree(string input)
+        List<double> GetAverageValue(Node tree)
         {
-            int index = 0;
+            var averages = new List<double>();
 
-            Node tree = null;
+            var queue = new Queue<Node>();
+            queue.Enqueue(tree);
 
-            while(index < input.Length)
+            while (queue.Count > 0)
             {
-                Node node = null;
-                var checker = input[index];
-                if(checker == '*' || checker == '+')
+                int count = 0;
+                int size = queue.Count;
+                for(int i=0; i<size; i++)
                 {
-                    node = new Node(checker.ToString());
-                }
-                else
-                {
-                    string num = checker.ToString();
-                    for(int i=index+1; i<input.Length; i++)
-                    {
-                        var check = input[i];
-                        if(check <= '9')
-                        {
-                            num += check.ToString();
-                        }
-                        else
-                        {
-                            index = i;
-                            break;
-                        }
-                    }
+                    var node = queue.Dequeue();
+                    count += node.Value;
 
-                    node = new Node(num);
+                    if (node.Left != null)
+                        queue.Enqueue(node.Left);
+                    if (node.Right != null)
+                        queue.Enqueue(node.Right);
                 }
-
-                if(tree == null)
-                {
-                    tree = node;
-                }
-                else
-                {
-
-                }
+                averages.Add(count / size);
             }
 
-            return tree;
+            return averages;
         }
+
 
         public class Node
         {
-            public string Value;
+            public int Value;
             public Node Right;
             public Node Left;
-            public Node Parent;
 
-            public bool IsNumber => !IsMultiply && !IsPlus;
-            public bool IsMultiply => Value == "*";
-            public bool IsPlus => Value == "+";
-
-            public Node(string value)
+            public Node(int value, Node left = null, Node right = null)
             {
                 Value = value;
+                Left = left;
+                Right = right;
             }
         }
     }
