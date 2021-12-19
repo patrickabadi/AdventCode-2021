@@ -59,8 +59,11 @@
     <Compile Include="adv014.cs" />
     <Compile Include="adv015.cs" />
     <Compile Include="adv016.cs" />
+    <Compile Include="adv017.cs" />
+    <Compile Include="adv018.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Subsets.cs" />
     <Compile Include="TestBinaryTree.cs" />
   </ItemGroup>
   <ItemGroup>
