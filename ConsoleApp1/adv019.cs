@@ -14,22 +14,6 @@ namespace ConsoleApp1
             var scanners = Parse(input2);
             var orientations = BuildOrientationList();
 
-            /*ResolveOrientation(scanners[0], scanners[1], orientations, true);
-
-            HashSet<Point> finalPoints = scanners[0].original_points;
-
-            Debug.WriteLine($"finalPoint before {finalPoints.Count}");
-
-            foreach(var pt in scanners[1].original_points)
-            {
-                var ptOriented = pt.Multiply(scanners[1].orientation);
-                var ptOffset = ptOriented.Offset(scanners[1].offset);
-                finalPoints.Add(ptOffset);
-            }
-
-            Debug.WriteLine($"finalPoint after {finalPoints.Count}");*/
-
-            //var result = CountInterdistanceMatches(scanners[0], scanners[1]);
             var result = FindBeacons(scanners, orientations);
             Debug.WriteLine($"Result {result}");
         }
@@ -40,133 +24,55 @@ namespace ConsoleApp1
             baseScanner.orientation = orientations[0]; // identity
             baseScanner.offset = new Point(0, 0, 0);
             baseScanner.foundMatch = true;
-            int baseScannerIndex = 0;
 
-            var visited = new HashSet<Tuple<int, int>>();
-
-            for(int i=1; i<scanners.Count; i++)
+            while(scanners.Any(_=>_.foundMatch== false))
             {
-                var scanner = scanners[i];
-                for(int j=0; j<scanners.Count; j++)
+                for (int i = 1; i < scanners.Count; i++)
                 {
-                    baseScanner = scanners[j];
-                    if (i == j || visited.Contains(new Tuple<int, int>(j, i)))
+                    var scanner = scanners[i];
+                    if (scanner.foundMatch)
                         continue;
 
-                    visited.Add(new Tuple<int, int>(j, i));
                     if (ResolveOrientation(baseScanner, scanner, orientations))
                     {
-                        Debug.WriteLine($"Found Match between {i} and {j}");
-                        scanner.referencesScannerIndex = j;
-                        break;
-                    }
-                }
+                        Debug.WriteLine($"Found Match for {i}");
+                        //scanner.referencesScannerIndex = j;
+                        scanner.foundMatch = true;
 
-                if(scanner.referencesScannerIndex < 0)
-                {
-                    Debug.WriteLine($"No match found for {i}");
-                    //break;
-                }
-            }
-
-            for (int i = 1; i < scanners.Count; i++)
-            {
-                var scanner = scanners[i];
-                for (int j = 0; j < scanners.Count; j++)
-                {
-                    baseScanner = scanners[j];
-                    if (i == j || visited.Contains(new Tuple<int, int>(j, i)))
-                        continue;
-
-                    visited.Add(new Tuple<int, int>(j, i));
-                    if (ResolveOrientation(baseScanner, scanner, orientations))
-                    {
-                        Debug.WriteLine($"Found Match between {i} and {j}");
-                        scanner.referencesScannerIndex = j;
-                        break;
-                    }
-                }
-
-                if (scanner.referencesScannerIndex < 0)
-                {
-                    Debug.WriteLine($"No match found for {i}");
-                    //break;
-                }
-            }
-
-            for (int i=0; i<scanners.Count; i++)
-            {
-                Debug.WriteLine($"scan {i} -> {scanners[i].referencesScannerIndex}");
-                /*var ovisited = new HashSet<int>();
-                if(IsOrphan(i, scanners, ovisited))
-                {
-                    Debug.WriteLine($"Orpha found at {i} -> {scanners[i].referencesScannerIndex}");
-                }*/
-            }
-
-            
-
-
-            // now that we have alignments just create a new list
-            HashSet<Point> finalPoints = scanners[0].original_points;
-
-
-            for(int i=1; i<scanners.Count; i++)
-            {
-                var scanner = scanners[i];
-                var points = new List<Point>();
-
-                foreach (var pt in scanner.original_points)
-                {
-                    points.Add(pt);
-                }
-                    
-                while (true)
-                {
-                    var modifiedPoints = new List<Point>();
-                    foreach(var pt in points)
-                    {
-                        var ptOriented = pt.Multiply(scanner.orientation);
-                        var ptOffset = ptOriented.Offset(scanner.offset);
-                        modifiedPoints.Add(ptOffset);
-                    }
-                    points = modifiedPoints;
-
-                    //Debug.WriteLine($"Add scan points from {scanners.IndexOf(scanner)} references {scanner.referencesScannerIndex}");
-                    if (scanner.referencesScannerIndex == 0)
-                    {
-                        Debug.WriteLine($"Add scan points from {i} points {points.Count} final before {finalPoints.Count}");
-                        
-                        foreach (var pt in points)
+                        foreach (var pt in scanner.original_points)
                         {
-                            finalPoints.Add(pt);
+                            var ptOriented = pt.Multiply(scanner.orientation);
+                            var ptOffset = ptOriented.Offset(scanner.offset);
+                            baseScanner.original_points.Add(ptOffset);
                         }
-                        Debug.WriteLine($"finalPoints After {finalPoints.Count}");
-                        break;
+
                     }
-
-                    scanner = scanners[scanner.referencesScannerIndex];
-
                 }
             }
 
-            return finalPoints.Count;
-            //return -1;
+            int max_manhattan_distance = int.MinValue;
+            for (int i = 0; i < scanners.Count-1; i++)
+            {
+                var scanner = scanners[i];
+                for(int j=i+1; j<scanners.Count; j++)
+                {
+                    var scanner2 = scanners[j];
+                    max_manhattan_distance = Math.Max(max_manhattan_distance, ManhattanDistance(scanner.offset, scanner2.offset));
+                }
+                Debug.WriteLine($"Scanner{i} location {scanner.offset.x},{scanner.offset.y},{scanner.offset.z}");
+                
+            }
+
+            Debug.WriteLine($"Max Manhattan {max_manhattan_distance}");
+
+            return baseScanner.original_points.Count;
         }
 
-        bool IsOrphan(int index, List<Scanner> scanners, HashSet<int> visited)
+        public int ManhattanDistance(Point p1, Point p2)
         {
-            var scanner = scanners[index];
-            if (index == 0 || scanner.referencesScannerIndex == 0)
-                return false;
-
-            if (visited.Contains(index))
-                return true;
-
-            visited.Add(index);
-
-            return IsOrphan(scanner.referencesScannerIndex, scanners, visited);
+            return Math.Abs(p1.x - p2.x) + Math.Abs(p1.y - p2.y) + Math.Abs(p1.z - p2.z);
         }
+
 
         bool ResolveOrientation(Scanner baseScanner, Scanner checkScanner, List<int[,]> orientations, bool debugOut = false)
         {
