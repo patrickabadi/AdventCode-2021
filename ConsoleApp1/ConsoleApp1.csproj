@@ -66,6 +66,8 @@
     <Compile Include="adv021.cs" />
     <Compile Include="adv022.cs" />
     <Compile Include="adv023.cs" />
+    <Compile Include="adv024.cs" />
+    <Compile Include="adv025.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Subsets.cs" />
